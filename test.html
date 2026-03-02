@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aathi's Snaacks | Taste the Tradition</title>
+    
+    <!-- Google Fonts for English and Tamil -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mukta+Malar:wght@400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS for rapid styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Phosphor Icons for UI Elements -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        // Tailwind Configuration to match our Design System
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            bg: '#FAFAF5',
+                            red: '#C04000',
+                            gold: '#D4AF37',
+                            dark: '#2D2D2D',
+                            wa: '#25D366'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        tamil: ['Mukta Malar', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #FAFAF5; color: #2D2D2D; overflow-x: hidden; }
+        .font-ta { font-family: 'Mukta Malar', sans-serif; line-height: 1.6; }
+        
+        [data-lang="ta"] { display: none; }
+        body.lang-tamil [data-lang="en"] { display: none; }
+        body.lang-tamil [data-lang="ta"] { display: inline-block; }
+        body.lang-tamil div[data-lang="ta"], body.lang-tamil p[data-lang="ta"], body.lang-tamil h1[data-lang="ta"], body.lang-tamil h2[data-lang="ta"], body.lang-tamil h3[data-lang="ta"] { display: block; }
+
+        .kolam-bg { position: relative; }
+        .kolam-bg::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.03"><circle cx="50" cy="50" r="40" fill="none" stroke="%23C04000" stroke-width="2"/><path d="M50 10 L50 90 M10 50 L90 50" stroke="%23C04000" stroke-width="2"/></svg>');
+            background-size: 150px; z-index: -1;
+        }
+
+        .wa-btn { transition: all 0.3s ease; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3); }
+        .wa-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4); }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-sm border-b border-brand-gold/30 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center gap-3">
+                    <img src="logo-nobg.jpeg" alt="Aathi's Snaacks Logo" class="w-12 h-12 object-contain rounded-full bg-white border-2 border-brand-gold shadow-sm">
+                    <div>
+                        <h1 class="font-bold text-xl tracking-tight text-brand-dark">
+                            <span data-lang="en">Aathi's Snaacks</span>
+                            <span data-lang="ta" class="font-ta">ஆதிஸ் ஸ்நாக்ஸ்</span>
+                        </h1>
+                        <p class="text-[10px] uppercase tracking-wider text-brand-red font-semibold">
+                            <span data-lang="en">Aathi Shivaya Group</span>
+                            <span data-lang="ta" class="font-ta">ஆதி சிவாய குழுமம்</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="flex items-center bg-white rounded-full p-1 border border-gray-200 shadow-sm">
+                    <button id="btn-en" class="px-4 py-1.5 text-sm font-semibold rounded-full bg-brand-dark text-white transition-colors" onclick="setLanguage('en')">EN</button>
+                    <button id="btn-ta" class="px-4 py-1.5 text-sm font-semibold rounded-full text-gray-500 hover:text-brand-dark transition-colors font-ta" onclick="setLanguage('ta')">தமிழ்</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="kolam-bg relative py-20 lg:py-32 overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <span class="inline-block py-1 px-3 rounded-full bg-brand-gold/20 text-brand-red text-sm font-semibold mb-6 tracking-wide uppercase">
+                <span data-lang="en">100% Authentic Traditional Sweets</span>
+                <span data-lang="ta" class="font-ta">100% பாரம்பரிய இனிப்புகள்</span>
+            </span>
+            
+            <h2 class="text-5xl md:text-6xl font-extrabold text-brand-dark mb-6 leading-tight">
+                <span data-lang="en">Taste the <span class="text-brand-red">Tradition</span></span>
+                <span data-lang="ta" class="font-ta font-bold text-5xl md:text-6xl text-brand-red">பாரம்பரியத்தின் சுவை</span>
+            </h2>
+            
+            <p class="mt-4 text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+                <span data-lang="en">Handcrafted snacks from the heart of Tamil Nadu. Direct to your home, zero compromises on purity.</span>
+                <span data-lang="ta" class="font-ta text-xl">தமிழ்நாட்டின் இதயப்பகுதியில் இருந்து உங்கள் இல்லத்திற்கு... சுத்தத்தில் சமரசம் இல்லை.</span>
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#products" class="inline-flex items-center gap-2 bg-brand-dark text-white px-8 py-4 rounded-full font-semibold hover:bg-black transition-colors">
+                    <span data-lang="en">Explore Menu</span>
+                    <span data-lang="ta" class="font-ta">மெனுவை காண்க</span>
+                    <i class="ph ph-arrow-down weight-bold"></i>
+                </a>
+                <!-- Hero Button Links to the Main WhatsApp Chat -->
+                <a href="https://wa.me/919342953995?text=Vanakkam!%20I%20would%20like%20to%20know%20more%20about%20your%20products." target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-brand-wa text-white px-8 py-4 rounded-full font-semibold hover:bg-green-600 transition-colors shadow-lg wa-btn">
+                    <i class="ph-fill ph-whatsapp-logo text-xl"></i>
+                    <span data-lang="en">Chat on WhatsApp</span>
+                    <span data-lang="ta" class="font-ta">வாட்ஸ்அப்பில் தொடர்புகொள்ள</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT US SECTION -->
+    <section class="py-20 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-3xl font-bold text-brand-dark mb-4">
+                <span data-lang="en">About Us</span>
+                <span data-lang="ta" class="font-ta text-3xl font-bold">எங்களை பற்றி</span>
+            </h3>
+            <div class="w-24 h-1 bg-brand-gold mx-auto rounded-full mb-8"></div>
+            <p class="text-lg text-gray-700 leading-relaxed mb-6">
+                <span data-lang="en">We are a proud unit of <strong class="text-brand-red">Aathi Shivaya Group</strong>, dedicated to bringing the authentic taste of Tamil Nadu's traditional snacks right to your doorstep. Every bite carries the legacy of our ancestors, crafted with love, purity, and uncompromising quality.</span>
+                <span data-lang="ta" class="font-ta">நாங்கள் <strong class="text-brand-red">ஆதி சிவாய குழுமத்தின்</strong> ஓர் அங்கம். தமிழ்நாட்டின் பாரம்பரிய தின்பண்டங்களின் உண்மையான சுவையை உங்கள் இல்லங்களுக்கே கொண்டு சேர்ப்பதில் பெருமை கொள்கிறோம். ஒவ்வொரு சுவையிலும் எங்கள் முன்னோர்களின் பாரம்பரியம், தூய்மை மற்றும் சமரசமற்ற தரம் நிறைந்துள்ளது.</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- PRODUCTS SECTION -->
+    <section id="products" class="py-20 bg-brand-bg">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h3 class="text-3xl font-bold text-brand-dark mb-4">
+                    <span data-lang="en">Our Signature Creations</span>
+                    <span data-lang="ta" class="font-ta text-3xl font-bold">எங்கள் சிறப்பு தயாரிப்புகள்</span>
+                </h3>
+                <div class="w-24 h-1 bg-brand-gold mx-auto rounded-full"></div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                
+                <!-- Product 1: Macroons -->
+                <div class="bg-brand-bg rounded-2xl overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-shadow group flex flex-col">
+                    <div class="h-64 bg-gray-200 relative overflow-hidden flex items-center justify-center">
+                        <img src="macaroons.jpeg" alt="Tuty Famous Macroons" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">Combo of 3 - 100gm</div>
+                            <h4 class="text-xl font-bold text-brand-dark mb-2">
+                                <span data-lang="en">Tuty Famous Macroons</span>
+                                <span data-lang="ta" class="font-ta font-bold">தூத்துக்குடி ஸ்பெஷல் மக்ரூன்</span>
+                            </h4>
+                            <p class="text-gray-600 text-sm mb-6">
+                                <span data-lang="en">Melt-in-mouth authentic cashew macroons straight from Thoothukudi.</span>
+                                <span data-lang="ta" class="font-ta text-sm">தூத்துக்குடியின் அசலான முந்திரி மக்ரூன். நாவில் கரையும் சுவை.</span>
+                            </p>
+                        </div>
+                        <button onclick="openModal('modal-macaroons')" class="w-full bg-brand-dark text-white flex items-center justify-center gap-2 py-3 rounded-xl font-semibold mt-auto hover:bg-black transition-colors">
+                            <i class="ph ph-eye text-xl"></i>
+                            <span data-lang="en">View Details</span>
+                            <span data-lang="ta" class="font-ta">விவரங்களை காண்க</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 2: Karupatti Mittai -->
+                <div class="bg-brand-bg rounded-2xl overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-shadow group flex flex-col">
+                    <div class="h-64 bg-gray-200 relative overflow-hidden flex items-center justify-center">
+                        <img src="karupatti.jpeg" alt="Karupatti Mittai" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">1 KG Pack</div>
+                            <h4 class="text-xl font-bold text-brand-dark mb-2">
+                                <span data-lang="en">Original Karupatti Mittai</span>
+                                <span data-lang="ta" class="font-ta font-bold">ஒரிஜினல் கருப்பட்டி மிட்டாய்</span>
+                            </h4>
+                            <p class="text-gray-600 text-sm mb-6">
+                                <span data-lang="en">Healthy, iron-rich palm jaggery sweets made traditional way.</span>
+                                <span data-lang="ta" class="font-ta text-sm">பாரம்பரிய முறையில் செய்யப்பட்ட, இரும்புச்சத்து மிக்க பனைவெல்ல மிட்டாய்.</span>
+                            </p>
+                        </div>
+                        <button onclick="openModal('modal-karupatti')" class="w-full bg-brand-dark text-white flex items-center justify-center gap-2 py-3 rounded-xl font-semibold mt-auto hover:bg-black transition-colors">
+                            <i class="ph ph-eye text-xl"></i>
+                            <span data-lang="en">View Details</span>
+                            <span data-lang="ta" class="font-ta">விவரங்களை காண்க</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product 3: Porikadalai -->
+                <div class="bg-brand-bg rounded-2xl overflow-hidden border border-gray-100 shadow-lg hover:shadow-xl transition-shadow group flex flex-col">
+                    <div class="h-64 bg-gray-200 relative overflow-hidden flex items-center justify-center">
+                        <img src="porikadalai.jpeg" alt="Porikadalai" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col justify-between">
+                        <div>
+                            <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">500 GM Pack</div>
+                            <h4 class="text-xl font-bold text-brand-dark mb-2">
+                                <span data-lang="en">Nayam Porikadalai</span>
+                                <span data-lang="ta" class="font-ta font-bold">நயம் பொரிகடலை</span>
+                            </h4>
+                            <p class="text-gray-600 text-sm mb-6">
+                                <span data-lang="en">Premium quality roasted gram, perfect for healthy snacking.</span>
+                                <span data-lang="ta" class="font-ta text-sm">உயர்தர வறுத்த பொரிகடலை, ஆரோக்கியமான சிற்றுண்டிக்கு ஏற்றது.</span>
+                            </p>
+                        </div>
+                        <button onclick="openModal('modal-porikadalai')" class="w-full bg-brand-dark text-white flex items-center justify-center gap-2 py-3 rounded-xl font-semibold mt-auto hover:bg-black transition-colors">
+                            <i class="ph ph-eye text-xl"></i>
+                            <span data-lang="en">View Details</span>
+                            <span data-lang="ta" class="font-ta">விவரங்களை காண்க</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- WHY CHOOSE US SECTION -->
+    <section class="py-20 bg-white border-t border-gray-100">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold text-brand-dark mb-4">
+                    <span data-lang="en">Why Choose Us?</span>
+                    <span data-lang="ta" class="font-ta text-3xl font-bold">ஏன் எங்களை தேர்வு செய்ய வேண்டும்?</span>
+                </h3>
+                <div class="w-24 h-1 bg-brand-gold mx-auto rounded-full"></div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl shadow-sm border border-gray-200">
+                <table class="w-full text-left border-collapse min-w-[600px]">
+                    <thead>
+                        <tr class="bg-gray-50 text-brand-dark">
+                            <th class="p-4 border-b border-gray-200 font-bold w-1/3">Criteria</th>
+                            <th class="p-4 border-b border-gray-200 font-semibold text-gray-500 w-1/3">Top Bulk Brands</th>
+                            <th class="p-4 border-b-2 border-brand-red bg-brand-gold/10 font-bold text-brand-red w-1/3">Aathi's Snaacks</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-700">
+                        <tr>
+                            <td class="p-4 border-b border-gray-100 font-semibold">Ingredients</td>
+                            <td class="p-4 border-b border-gray-100 text-gray-500">Artificial flavors & Preservatives</td>
+                            <td class="p-4 border-b border-gray-100 bg-brand-gold/5 font-bold text-brand-dark"><i class="ph-fill ph-check-circle text-brand-wa mr-1"></i> 100% Natural & Pure</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 border-b border-gray-100 font-semibold">Preparation</td>
+                            <td class="p-4 border-b border-gray-100 text-gray-500">Machine-made in factories</td>
+                            <td class="p-4 border-b border-gray-100 bg-brand-gold/5 font-bold text-brand-dark"><i class="ph-fill ph-check-circle text-brand-wa mr-1"></i> Traditional Handcrafted</td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 font-semibold">Taste</td>
+                            <td class="p-4 text-gray-500">Standardized / Plain</td>
+                            <td class="p-4 bg-brand-gold/5 font-bold text-brand-dark"><i class="ph-fill ph-check-circle text-brand-wa mr-1"></i> Authentic 'Maanvasanai'</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-white py-12 border-t-4 border-brand-red">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <img src="logo-nobg.jpeg" alt="Aathi's Snaacks Logo" class="w-16 h-16 mx-auto mb-4 object-contain rounded-full bg-white border-2 border-brand-gold shadow-md">
+            <h2 class="text-2xl font-bold mb-2">
+                <span data-lang="en">Aathi's Snaacks</span>
+                <span data-lang="ta" class="font-ta">ஆதிஸ் ஸ்நாக்ஸ்</span>
+            </h2>
+            <p class="text-gray-400 text-sm mb-8">
+                <span data-lang="en">A proud unit of</span>
+                <span data-lang="ta" class="font-ta">ஓர் அங்கம்:</span>
+                <strong class="text-brand-gold">
+                    <span data-lang="en">Aathi Shivaya Group of Companies</span>
+                    <span data-lang="ta" class="font-ta">ஆதி சிவாய குழுமம்</span>
+                </strong>
+            </p>
+            
+            <p class="text-xs text-gray-500">
+                &copy; <span id="year"></span> <span data-lang="en">Aathi Shivaya Group. All rights reserved.</span><span data-lang="ta" class="font-ta">ஆதி சிவாய குழுமம். அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.</span> <br>
+            </p>
+        </div>
+    </footer>
+
+    <!-- PRODUCT MODALS -->
+    
+    <!-- Modal 1: Macroons -->
+    <div id="modal-macaroons" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-brand-bg rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('modal-macaroons')" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-800 hover:text-brand-red transition shadow-sm">
+                <i class="ph ph-x text-xl font-bold"></i>
+            </button>
+            <div class="h-48 bg-gray-200 relative flex items-center justify-center shrink-0">
+                <i class="ph ph-cookie text-6xl text-gray-400"></i>
+            </div>
+            <div class="p-6 md:p-8 overflow-y-auto">
+                <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">Combo of 3 - 100gm</div>
+                <h4 class="text-3xl font-bold text-brand-dark mb-4">
+                    <span data-lang="en">Tuty Famous Macroons</span>
+                    <span data-lang="ta" class="font-ta font-bold">தூத்துக்குடி ஸ்பெஷல் மக்ரூன்</span>
+                </h4>
+                <div class="space-y-4 mb-8 text-gray-600">
+                    <p>Melt-in-mouth authentic cashew macroons straight from Thoothukudi.</p>
+                </div>
+                <!-- CORRECTED PRE-FILLED WHATSAPP LINK -->
+                <a href="https://wa.me/919342953995?text=Vanakkam!%20I%20would%20like%20to%20order%20the%20Tuty%20Famous%20Macroons%20(Combo%20of%203)." target="_blank" rel="noopener noreferrer" class="wa-btn w-full bg-brand-wa text-white flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-lg shadow-lg">
+                    <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
+                    <span data-lang="en">Order on WhatsApp</span>
+                    <span data-lang="ta" class="font-ta">வாட்ஸ்அப்பில் ஆர்டர் செய்ய</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Karupatti Mittai -->
+    <div id="modal-karupatti" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-brand-bg rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('modal-karupatti')" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-800 hover:text-brand-red transition shadow-sm">
+                <i class="ph ph-x text-xl font-bold"></i>
+            </button>
+            <div class="h-48 bg-gray-200 relative flex items-center justify-center shrink-0">
+                <i class="ph ph-hexagon text-6xl text-gray-400"></i>
+            </div>
+            <div class="p-6 md:p-8 overflow-y-auto">
+                <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">1 KG Pack</div>
+                <h4 class="text-3xl font-bold text-brand-dark mb-4">
+                    <span data-lang="en">Original Karupatti Mittai</span>
+                    <span data-lang="ta" class="font-ta font-bold">ஒரிஜினல் கருப்பட்டி மிட்டாய்</span>
+                </h4>
+                <div class="space-y-4 mb-8 text-gray-600">
+                    <p>Healthy, iron-rich palm jaggery sweets made the traditional way.</p>
+                </div>
+                <!-- CORRECTED PRE-FILLED WHATSAPP LINK -->
+                <a href="https://wa.me/919342953995?text=Vanakkam!%20I%20would%20like%20to%20order%20the%201kg%20Original%20Karupatti%20Mittai." target="_blank" rel="noopener noreferrer" class="wa-btn w-full bg-brand-wa text-white flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-lg shadow-lg">
+                    <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
+                    <span data-lang="en">Order on WhatsApp</span>
+                    <span data-lang="ta" class="font-ta">வாட்ஸ்அப்பில் ஆர்டர் செய்ய</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Porikadalai -->
+    <div id="modal-porikadalai" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-brand-bg rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl relative max-h-[90vh] flex flex-col">
+            <button onclick="closeModal('modal-porikadalai')" class="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-white rounded-full text-gray-800 hover:text-brand-red transition shadow-sm">
+                <i class="ph ph-x text-xl font-bold"></i>
+            </button>
+            <div class="h-48 bg-gray-200 relative flex items-center justify-center shrink-0">
+                <i class="ph ph-grains text-6xl text-gray-400"></i>
+            </div>
+            <div class="p-6 md:p-8 overflow-y-auto">
+                <div class="text-xs font-bold text-brand-red uppercase tracking-wider mb-2">500 GM Pack</div>
+                <h4 class="text-3xl font-bold text-brand-dark mb-4">
+                    <span data-lang="en">Nayam Porikadalai</span>
+                    <span data-lang="ta" class="font-ta font-bold">நயம் பொரிகடலை</span>
+                </h4>
+                <div class="space-y-4 mb-8 text-gray-600">
+                    <p>Premium quality roasted gram, perfect for healthy snacking anytime.</p>
+                </div>
+                <!-- CORRECTED PRE-FILLED WHATSAPP LINK -->
+                <a href="https://wa.me/919342953995?text=Vanakkam!%20I%20would%20like%20to%20order%20the%20500gm%20Nayam%20Porikadalai." target="_blank" rel="noopener noreferrer" class="wa-btn w-full bg-brand-wa text-white flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-lg shadow-lg">
+                    <i class="ph-fill ph-whatsapp-logo text-2xl"></i>
+                    <span data-lang="en">Order on WhatsApp</span>
+                    <span data-lang="ta" class="font-ta">வாட்ஸ்அப்பில் ஆர்டர் செய்ய</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('fixed')) {
+                const modals = document.querySelectorAll('.fixed.z-\\[100\\]');
+                modals.forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        }
+
+        function setLanguage(lang) {
+            const body = document.body;
+            const btnEn = document.getElementById('btn-en');
+            const btnTa = document.getElementById('btn-ta');
+
+            if (lang === 'ta') {
+                body.classList.add('lang-tamil');
+                btnTa.classList.remove('text-gray-500', 'hover:text-brand-dark');
+                btnTa.classList.add('bg-brand-dark', 'text-white');
+                btnEn.classList.remove('bg-brand-dark', 'text-white');
+                btnEn.classList.add('text-gray-500', 'hover:text-brand-dark');
+                localStorage.setItem('preferredLang', 'ta');
+            } else {
+                body.classList.remove('lang-tamil');
+                btnEn.classList.remove('text-gray-500', 'hover:text-brand-dark');
+                btnEn.classList.add('bg-brand-dark', 'text-white');
+                btnTa.classList.remove('bg-brand-dark', 'text-white');
+                btnTa.classList.add('text-gray-500', 'hover:text-brand-dark');
+                localStorage.setItem('preferredLang', 'en');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('preferredLang') || 'en';
+            setLanguage(savedLang);
+        });
+    </script>
+</body>
+</html>
