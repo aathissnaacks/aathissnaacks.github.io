@@ -141,6 +141,15 @@
         result[col] = [];
       }
     }
+    // Load delivery settings from settings/delivery document
+    try {
+      const { doc: fsDoc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const settingSnap = await getDoc(fsDoc(db, 'settings', 'delivery'));
+      if (settingSnap.exists()) {
+        result.settings = { delivery: settingSnap.data() };
+        console.log('[Firebase] delivery settings fetched:', settingSnap.data());
+      }
+    } catch(e) { console.error('[Firebase] settings fetch error:', e.code, e.message); }
     return result;
   };
 
@@ -1057,7 +1066,8 @@ body.lang-tamil button[data-lang="ta"] { display: inline; }
     </div>
     <div class="cart-total-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
     <div class="cart-total-row" id="cart-discount-row" style="display:none;color:#16a34a;"><span>Discount</span><span id="cart-discount-val">−₹0</span></div>
-    <div class="cart-total-row"><span>Shipping</span><span id="cart-shipping">Calculated at checkout</span></div>
+    <div class="cart-total-row" id="cart-shipping-row"><span>Delivery</span><span id="cart-shipping">—</span></div>
+    <div id="cart-free-nudge" style="text-align:center;padding:0.4rem 0;display:none;"></div>
     <div class="cart-total-main">
       <span>Total</span>
       <span id="cart-total">₹0</span>
@@ -1251,9 +1261,10 @@ const DEFAULT_PRODUCTS = [
 // LIVE STATE (populated from Firebase or defaults)
 // ══════════════════════════════════════════════════════════
 let PRODUCTS = [...DEFAULT_PRODUCTS];
-let PROMOS   = [];   // [{id, title, subtitle, badge, bgColor, active, endsAt}]
-let COUPONS  = [];   // [{id, code, type:'percent'|'flat', value, minOrder, maxUses, usedCount, active, expiresAt}]
-let LAUNCHES = [];   // [{id, title, subtitle, eyebrow, img, items[], price, mrp, productId, variantIdx, stockTotal, stockLeft, endsAt, active}]
+let PROMOS   = [];
+let COUPONS  = [];
+let LAUNCHES = [];
+let DELIVERY_SETTINGS = { fee: 75, freeAbove: 499 }; // defaults
 
 let cart = JSON.parse(localStorage.getItem('as_cart') || '[]');
 let currentOrderId = null;
@@ -1311,6 +1322,10 @@ async function loadStoreConfig() {
     if (config.promos)   PROMOS   = config.promos;
     if (config.coupons)  COUPONS  = config.coupons;
     if (config.launches) LAUNCHES = config.launches;
+    if (config.settings && config.settings.delivery) {
+      DELIVERY_SETTINGS = config.settings.delivery;
+      console.log('[Store] delivery settings:', DELIVERY_SETTINGS);
+    }
 
     renderProducts();
     renderPromos();
@@ -1657,7 +1672,17 @@ function couponDiscount() {
   return appliedCoupon.discount;
 }
 
-function cartTotal() { return Math.max(0, cartSubtotal() - couponDiscount()); }
+// Delivery fee — calculated on subtotal BEFORE coupon
+function deliveryFee() {
+  const sub = cartSubtotal(); // pre-coupon subtotal
+  if (!sub) return 0;
+  if (sub >= DELIVERY_SETTINGS.freeAbove) return 0;
+  return DELIVERY_SETTINGS.fee;
+}
+
+function cartTotal() {
+  return Math.max(0, cartSubtotal() - couponDiscount() + deliveryFee());
+}
 
 function renderCart() {
   const container = document.getElementById('cart-items');
@@ -1688,11 +1713,37 @@ function renderCart() {
     `).join('');
   }
 
-  const sub = cartSubtotal();
+  const sub  = cartSubtotal();
   const disc = couponDiscount();
+  const fee  = deliveryFee();
   const total = cartTotal();
   document.getElementById('cart-subtotal').textContent = '₹' + sub;
-  document.getElementById('cart-total').textContent = '₹' + total;
+  document.getElementById('cart-total').textContent    = '₹' + total;
+
+  // Shipping row
+  const shippingEl = document.getElementById('cart-shipping');
+  const shippingRow = document.getElementById('cart-shipping-row');
+  if (shippingEl) {
+    if (!sub) {
+      shippingEl.textContent = '—';
+    } else if (fee === 0) {
+      shippingEl.innerHTML = '<span style="color:#16a34a;font-weight:700;">FREE 🎉</span>';
+    } else {
+      shippingEl.textContent = '₹' + fee;
+    }
+  }
+
+  // Free shipping nudge
+  const nudgeEl = document.getElementById('cart-free-nudge');
+  if (nudgeEl) {
+    const needed = DELIVERY_SETTINGS.freeAbove - sub;
+    if (sub > 0 && fee > 0 && needed > 0) {
+      nudgeEl.style.display = '';
+      nudgeEl.innerHTML = `<span style="font-size:0.78rem;color:var(--red);background:rgba(192,64,0,0.08);padding:0.35rem 0.75rem;border-radius:999px;display:inline-block;">Add ₹${needed} more for <strong>FREE delivery</strong></span>`;
+    } else {
+      nudgeEl.style.display = 'none';
+    }
+  }
 
   // Show/hide coupon section in cart
   const couponEl = document.getElementById('cart-coupon-section');
@@ -1788,14 +1839,16 @@ function closeCheckout() {
 }
 
 function renderCheckoutSummary() {
-  const el = document.getElementById('checkout-summary');
-  const sub = cartSubtotal();
+  const el   = document.getElementById('checkout-summary');
+  const sub  = cartSubtotal();
   const disc = couponDiscount();
+  const fee  = deliveryFee();
   const total = cartTotal();
   el.innerHTML = cart.map(i =>
     `<div class="item-row"><span>${i.name} (${i.variant}) ×${i.qty}</span><span>₹${i.price * i.qty}</span></div>`
   ).join('')
   + (disc > 0 ? `<div class="item-row" style="color:#16a34a"><span>Coupon (${appliedCoupon.code})</span><span>−₹${disc}</span></div>` : '')
+  + (fee > 0  ? `<div class="item-row" style="color:#555"><span>Delivery Fee</span><span>₹${fee}</span></div>` : `<div class="item-row" style="color:#16a34a"><span>Delivery</span><span>FREE 🎉</span></div>`)
   + `<div class="total-row"><span>Total Payable</span><span>₹${total}</span></div>`;
 }
 
@@ -1824,6 +1877,7 @@ async function placeOrder() {
     items: cart.map(i => ({ id: i.id, name: i.name, variant: i.variant, price: i.price, qty: i.qty })),
     subtotal: cartSubtotal(),
     discount: couponDiscount(),
+    deliveryFee: deliveryFee(),
     coupon: appliedCoupon ? appliedCoupon.code : null,
     total: cartTotal(),
     upiId: UPI_ID
