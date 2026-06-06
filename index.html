@@ -1003,11 +1003,11 @@ body.lang-tamil button[data-lang="ta"] { display: inline; }
       </div>
       <div class="footer-links">
         <h4>Quick Links</h4>
-        <a href="about.html">About us</a>
         <a href="terms.html">Terms & Conditions</a>
         <a href="refund.html">Cancellation & Refund</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="contact.html">Contact Us</a>
+        <a href="admin.html">Admin Panel</a>
       </div>
       <div class="footer-contact">
         <h4 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:1rem;font-family:'DM Sans',sans-serif;font-weight:600;">Contact</h4>
@@ -1243,7 +1243,7 @@ const DEFAULT_PRODUCTS = [
     desc: 'Macroons + Groundnut Balls + Mixture + Salted Groundnuts + Porikadalai. Best value pack!',
     descTa: 'மக்ரூன் + கடலை உருண்டை + மிக்சர் + நிலக்கடலை + பொரிகடலை.',
     img: 'combo1.jpeg',
-    variants: [{ label: '1 Pack', price: 499, mrp: 449 }]
+    variants: [{ label: '1 Pack', price: 319, mrp: 399 }]
   }
 ];
 
@@ -1377,7 +1377,7 @@ function renderLaunch() {
         '100g Salted Groundnuts',
         '200g Uruttu Porikadalai'
       ],
-      price: 449, mrp: 499,
+      price: 319, mrp: 399,
       productId: 'combo1', variantLabel: '1 Pack',
       endsAt: null,
       stockTotal: 0, stockLeft: 0
@@ -1572,7 +1572,7 @@ function renderProducts() {
         </div>
         <div class="product-price-row">
           <span class="product-price" id="price-${p.id}">₹${defVariant.price}</span>
-          ${defVariant.mrp > defVariant.price ? `<span class="product-mrp">₹${defVariant.mrp}</span><span class="product-save">Save ₹${saveAmt}</span>` : ''}
+          ${defVariant.mrp > defVariant.price ? `<span class="product-mrp" id="mrp-${p.id}">₹${defVariant.mrp}</span><span class="product-save" id="save-${p.id}">Save ₹${saveAmt}</span>` : `<span class="product-mrp" id="mrp-${p.id}" style="display:none"></span><span class="product-save" id="save-${p.id}" style="display:none"></span>`}
         </div>
         <button class="btn-add-cart" id="btn-${p.id}" onclick="addProductToCart('${p.id}')">
           🛒 Add to Cart
@@ -1588,7 +1588,25 @@ function updatePrice(pid) {
   if (!p) return;
   const sel = document.getElementById('var-' + pid);
   const v = p.variants[parseInt(sel.value)];
+
+  // Selling price
   document.getElementById('price-' + pid).textContent = '₹' + v.price;
+
+  // MRP and save badge
+  const mrpEl  = document.getElementById('mrp-'  + pid);
+  const saveEl = document.getElementById('save-' + pid);
+  if (!mrpEl || !saveEl) return;
+
+  const save = (v.mrp || 0) - v.price;
+  if (v.mrp && v.mrp > v.price) {
+    mrpEl.textContent  = '₹' + v.mrp;
+    saveEl.textContent = 'Save ₹' + save;
+    mrpEl.style.display  = '';
+    saveEl.style.display = '';
+  } else {
+    mrpEl.style.display  = 'none';
+    saveEl.style.display = 'none';
+  }
 }
 
 function addProductToCart(pid) {
