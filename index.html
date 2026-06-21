@@ -28,7 +28,7 @@
   import { initializeApp, getApps } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import {
     getFirestore, collection, addDoc, getDocs,
-    doc, updateDoc, serverTimestamp
+    doc, updateDoc, serverTimestamp, runTransaction
   } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const firebaseConfig = {
@@ -61,22 +61,44 @@
   }
 
   // ── GENERATE ORDER ID: AathiMMYYXXXX ──
-  function generateOrderId() {
+  // Uses a shared Firestore counter (via transaction) so the sequence number
+  // is unique across ALL customers/devices — NOT a per-browser localStorage
+  // counter, which caused every new customer's first order of the month to
+  // collide on 0001 and silently overwrite each other's order document.
+  async function generateOrderId() {
     const now = new Date();
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const yy = String(now.getFullYear()).slice(-2);
-    const counterKey = `as_order_counter_${mm}${yy}`;
-    const current = parseInt(localStorage.getItem(counterKey) || '0') + 1;
-    localStorage.setItem(counterKey, String(current));
-    const seq = String(current).padStart(4, '0');
-    return `Aathi${mm}${yy}${seq}`;
+
+    if (db) {
+      try {
+        const counterRef = doc(db, 'counters', `orders_${mm}${yy}`);
+        const next = await runTransaction(db, async (transaction) => {
+          const snap = await transaction.get(counterRef);
+          const current = snap.exists() ? (snap.data().count || 0) : 0;
+          const updated = current + 1;
+          transaction.set(counterRef, { count: updated }, { merge: true });
+          return updated;
+        });
+        const seq = String(next).padStart(4, '0');
+        return `Aathi${mm}${yy}${seq}`;
+      } catch (e) {
+        console.error('[Firebase] Order counter transaction failed, falling back:', e.code, e.message);
+        // Fall through to offline fallback below
+      }
+    }
+
+    // Offline / Firestore unavailable fallback — not perfectly sequential,
+    // but timestamp-based so two different devices still won't collide.
+    const fallbackSeq = String(Date.now()).slice(-4);
+    return `Aathi${mm}${yy}${fallbackSeq}`;
   }
-  window._generateOrderId = generateOrderId; // expose for fallback use
+  window._generateOrderId = generateOrderId; // expose for fallback use (now async)
 
   // ── SAVE ORDER ──
   window.saveOrderToFirebase = async function(orderData) {
     // Generate custom order ID
-    const customId = generateOrderId();
+    const customId = await generateOrderId();
 
     // Always save to localStorage as backup
     const saveLocal = (data, id) => {
@@ -101,7 +123,7 @@
         ...orderData,
         status: 'pending_payment',
         createdAt: serverTimestamp()
-      });
+      }, { merge: true });
       console.log('[Firebase] Order saved to Firestore:', customId);
       saveLocal(orderData, customId);
       return customId;
@@ -1016,7 +1038,7 @@ body.lang-tamil button[data-lang="ta"] { display: inline; }
         <a href="refund.html">Cancellation & Refund</a>
         <a href="privacy.html">Privacy Policy</a>
         <a href="contact.html">Contact Us</a>
-        <a href="admin.html">Admin Panel</a>
+        <a href="about.html">About Us</a>
       </div>
       <div class="footer-contact">
         <h4 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em;color:#666;margin-bottom:1rem;font-family:'DM Sans',sans-serif;font-weight:600;">Contact</h4>
@@ -1884,7 +1906,11 @@ async function placeOrder() {
   };
 
   try { currentOrderId = await window.saveOrderToFirebase(orderData); }
-  catch(e) { currentOrderId = window._generateOrderId ? window._generateOrderId() : 'Aathi' + (()=>{ const n=new Date(); return String(n.getMonth()+1).padStart(2,'0') + String(n.getFullYear()).slice(-2) + '0001'; })(); }
+  catch(e) {
+    currentOrderId = window._generateOrderId
+      ? await window._generateOrderId()
+      : 'Aathi' + (() => { const n=new Date(); return String(n.getMonth()+1).padStart(2,'0') + String(n.getFullYear()).slice(-2) + String(Date.now()).slice(-4); })();
+  }
 
   btn.disabled = false; btn.textContent = 'Continue to Payment →';
   closeCheckout();
